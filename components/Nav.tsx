@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function Nav(){return <header className="topbar"><div className="container nav"><Link className="logo" href="/">WATCH<span>VAULT</span></Link><nav className="navlinks"><Link href="/collection">Collezioni</Link><Link href="/social">Community</Link><Link href="/marketplace">Marketplace</Link><Link href="/maintenance">Manutenzioni</Link></nav><Link className="btn" href="/login">Accedi</Link><Link className="btn primary" href="/register">Registrati</Link></div></header>}

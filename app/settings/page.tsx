@@ -1,0 +1,14 @@
+'use client';
+import AppShell from '@/components/AppShell';
+import {useEffect,useState} from 'react';
+import {Check,MonitorCog,Moon,Sun,Palette} from 'lucide-react';
+
+type Theme='dark'|'white-luxury'|'colour-eink';
+const themes:{id:Theme;name:string;description:string;icon:typeof Moon;swatches:string[]}[]=[
+  {id:'dark',name:'Scuro',description:'Nero profondo, grafite e dettagli oro. Il look classico di WatchVault.',icon:Moon,swatches:['#090b10','#171c26','#d8ad5b','#f7f8fa']},
+  {id:'white-luxury',name:'White Luxury',description:'Avorio, bianco caldo, champagne e nero. Elegante come una boutique di alta orologeria.',icon:Sun,swatches:['#f7f3ea','#ffffff','#b68a3d','#191713']},
+  {id:'colour-eink',name:'Colour e‑Ink',description:'Carta calda, colori desaturati e contrasto morbido ispirato ai display e‑ink a colori.',icon:Palette,swatches:['#e9e3d7','#d8d4c6','#8d4f42','#3f6f68']}
+];
+
+function applyTheme(t:Theme){document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t==='dark'?'dark':'light';localStorage.setItem('watchvault-theme',t)}
+export default function SettingsPage(){const[theme,setTheme]=useState<Theme>('dark');useEffect(()=>{const saved=(localStorage.getItem('watchvault-theme')||'dark') as Theme;setTheme(saved);applyTheme(saved)},[]);function choose(t:Theme){setTheme(t);applyTheme(t)}return <AppShell><div className="pagehead settings-head"><div><div className="eyebrow">PERSONALIZZA WATCHVAULT</div><h1>Impostazioni</h1><p className="page-subtitle muted">Scegli come deve apparire la tua esperienza WatchVault.</p></div><MonitorCog size={34}/></div><section className="settings-section"><h2>Aspetto</h2><p className="muted">Il tema viene salvato su questo dispositivo e applicato immediatamente.</p><div className="theme-grid">{themes.map(t=>{const Icon=t.icon;const active=theme===t.id;return <button type="button" key={t.id} className={`theme-card ${active?'selected':''}`} onClick={()=>choose(t.id)} aria-pressed={active}><div className="theme-card-top"><div className="theme-icon"><Icon size={22}/></div>{active&&<span className="theme-check"><Check size={17}/></span>}</div><div className="theme-preview" data-preview={t.id}><div className="preview-header"><span></span><span></span></div><div className="preview-hero"></div><div className="preview-row"><span></span><span></span></div></div><div className="theme-copy"><h3>{t.name}</h3><p>{t.description}</p><div className="theme-swatches">{t.swatches.map(c=><span key={c} style={{background:c}}/>)}</div></div></button>})}</div></section><section className="settings-section settings-info"><h2>Preferenze interfaccia</h2><div className="settings-row"><div><strong>Tema attivo</strong><p className="muted">{themes.find(t=>t.id===theme)?.name}</p></div><span className="status">Salvato</span></div></section></AppShell>}

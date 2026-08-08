@@ -4,6 +4,8 @@ export type Watch = {
   dial: string; waterResistance: string; purchasePrice: number; currentValue: number;
   condition: string; status: string; image: string; serial: string; notes: string;
   lifecycleStatus?: 'active'|'for_sale'|'transferred'|'sold_external'|'lost'|'stolen'|'recovered';
+  isForSale?: boolean;
+  lossStatus?: 'none'|'lost'|'stolen'|'recovered'|string;
   isNumbered?: boolean; editionNumber?: number|null; editionTotal?: number|null;
 };
 export type Maintenance = { id:string; watchId:string; watch:string; type:string; due:string; status:string; cost:number; provider:string; notes:string };

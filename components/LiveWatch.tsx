@@ -1,22 +1,4 @@
 'use client';
 import {useEffect,useState} from 'react';
-
-export default function LiveWatch(){
-  const[now,setNow]=useState(new Date());
-  useEffect(()=>{const id=setInterval(()=>setNow(new Date()),1000);return()=>clearInterval(id)},[]);
-  const seconds=now.getSeconds()+now.getMilliseconds()/1000;
-  const minutes=now.getMinutes()+seconds/60;
-  const hours=(now.getHours()%12)+minutes/60;
-  const secondDeg=seconds*6;
-  const minuteDeg=minutes*6;
-  const hourDeg=hours*30;
-  return <div className="watch-face" aria-label={`Ora locale ${now.toLocaleTimeString('it-IT')}`}>
-    {Array.from({length:12}).map((_,i)=><span key={i} className="hour-marker" style={{transform:`translateX(-50%) rotate(${i*30}deg)`}}/>) }
-    <div className="watch-brand">WATCHVAULT</div>
-    <div className="watch-sub">COLLECT • PRESERVE • SHARE</div>
-    <span className="hand hour-hand" style={{transform:`translateX(-50%) rotate(${hourDeg}deg)`}}/>
-    <span className="hand minute-hand" style={{transform:`translateX(-50%) rotate(${minuteDeg}deg)`}}/>
-    <span className="hand second-hand" style={{transform:`translateX(-50%) rotate(${secondDeg}deg)`}}/>
-    <span className="watch-pin"/>
-  </div>
-}
+type WatchStyle='classic'|'chronograph'|'digital-red'|'spaceview';
+export default function LiveWatch(){const[now,setNow]=useState(new Date());const[style,setStyle]=useState<WatchStyle>('classic');useEffect(()=>{const read=()=>setStyle((localStorage.getItem('watchvault-clock-style')||'classic') as WatchStyle);read();window.addEventListener('watchvault-clock-style',read);const id=setInterval(()=>setNow(new Date()),1000);return()=>{clearInterval(id);window.removeEventListener('watchvault-clock-style',read)}},[]);const seconds=now.getSeconds()+now.getMilliseconds()/1000,minutes=now.getMinutes()+seconds/60,hours=(now.getHours()%12)+minutes/60;if(style==='digital-red')return <div className="watch-face digital-watch" aria-label={`Ora locale ${now.toLocaleTimeString('it-IT')}`}><div className="digital-brand">WATCHVAULT</div><div className="digital-time">{now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</div><div className="digital-date">{now.toLocaleDateString('it-IT',{weekday:'short',day:'2-digit',month:'short'})}</div></div>;return <div className={`watch-face ${style==='chronograph'?'watch-chronograph':''} ${style==='spaceview'?'watch-spaceview':''}`} aria-label={`Ora locale ${now.toLocaleTimeString('it-IT')}`}>{style==='spaceview'&&<div className="spaceview-mechanism"><i/><i/><i/><i/><i/></div>}{Array.from({length:12}).map((_,i)=><span key={i} className="hour-marker" style={{transform:`translateX(-50%) rotate(${i*30}deg)`}}/>)}<div className="watch-brand">WATCHVAULT</div><div className="watch-sub">{style==='spaceview'?'ELECTRONIC TIME LAB':style==='chronograph'?'CHRONOGRAPH':'COLLECT • PRESERVE • SHARE'}</div>{style==='chronograph'&&<><div className="chrono-dial chrono-left">30</div><div className="chrono-dial chrono-right">60</div><div className="chrono-dial chrono-bottom">12</div></>}<span className="hand hour-hand" style={{transform:`translateX(-50%) rotate(${hours*30}deg)`}}/><span className="hand minute-hand" style={{transform:`translateX(-50%) rotate(${minutes*6}deg)`}}/><span className="hand second-hand" style={{transform:`translateX(-50%) rotate(${seconds*6}deg)`}}/><span className="watch-pin"/></div>}

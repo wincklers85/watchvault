@@ -2,7 +2,8 @@
 import AppShell from '@/components/AppShell';
 import {useEffect,useState} from 'react';
 import {createListing,fetchMyWatches,getSession} from '@/lib/supabase';
-import {addListingComment,fetchListingComments,fetchMarketplacePublic,incrementListingView,sendMarketplaceOffer,toggleListingLike} from '@/lib/community-marketplace';
+import {sendMarketplaceOffer} from '@/lib/watchvault-v2';
+import {addListingComment,fetchListingComments,fetchMarketplacePublic,incrementListingView,toggleListingLike} from '@/lib/community-marketplace';
 import {Watch} from '@/lib/types';
 import {Eye,Heart,MessageCircle,Tag,X} from 'lucide-react';
 const fallback='https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=1000&q=80';

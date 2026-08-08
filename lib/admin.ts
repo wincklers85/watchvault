@@ -1,0 +1,12 @@
+'use client';
+import {getSession} from './supabase';
+const base=(process.env.NEXT_PUBLIC_SUPABASE_URL||process.env.SUPABASE_URL)?.replace(/\/$/,'');
+const key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY||process.env.SUPABASE_PUBLISHABLE_KEY;
+function h(){const s=getSession();if(!s||!base||!key)throw new Error('Sessione scaduta.');return {'Content-Type':'application/json',apikey:key,Authorization:`Bearer ${s.access_token}`}}
+async function rest(path:string){const r=await fetch(`${base}/rest/v1/${path}`,{headers:h()});if(!r.ok)throw new Error((await r.json().catch(()=>({}))).message||'Operazione non riuscita');return r.json()}
+async function rpc(name:string,body:any){const r=await fetch(`${base}/rest/v1/rpc/${name}`,{method:'POST',headers:h(),body:JSON.stringify(body)});if(!r.ok)throw new Error((await r.json().catch(()=>({}))).message||'Operazione non riuscita');return r.text()}
+export async function fetchAdminDashboard(){const me=getSession()?.user.id;if(!me)throw new Error('Accedi di nuovo.');const mine=(await rest(`profiles?id=eq.${me}&select=id,username,role,status&limit=1`))[0];if(!['admin','superuser'].includes(mine?.role))throw new Error('Area riservata allo staff.');const [users,reports,alerts]=await Promise.all([rest('profiles?select=id,username,full_name,role,status,created_at&order=created_at.desc&limit=250'),rest('reports?select=*&order=created_at.desc&limit=100'),rest('watch_serial_alerts?select=*&order=created_at.desc&limit=100')]);return{me:mine,users,reports,alerts}}
+export const setUserStatus=(id:string,status:string)=>rpc('admin_set_user_status',{p_user:id,p_status:status});
+export const setUserRole=(id:string,role:string)=>rpc('superuser_set_role',{p_user:id,p_role:role});
+export const reviewSerialAlert=(id:string,status:string,notes='')=>rpc('admin_review_serial_alert',{p_alert:id,p_status:status,p_notes:notes});
+export const hardDeletePost=(id:string)=>rpc('superuser_hard_delete_post',{p_post:id});

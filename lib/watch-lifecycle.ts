@@ -11,6 +11,6 @@ export async function addWatchHistoryEvent(input:{watchId:string;eventType:strin
 export async function initiateWatchTransfer(watchId:string,username:string,message?:string){return rpc('initiate_watch_transfer',{p_watch:watchId,p_username:username,p_message:message||null})}
 export async function setWatchLossStatus(watchId:string,status:'lost'|'stolen'|'recovered',notes?:string){return rpc('set_watch_loss_status',{p_watch:watchId,p_status:status,p_notes:notes||null})}
 export async function completeMarketplaceSale(listingId:string,buyerUsername?:string){return rpc('complete_marketplace_sale',{p_listing:listingId,p_buyer_username:buyerUsername?.trim()||null})}
-export async function fetchIncomingTransfers(){const s=getSession();if(!s)return[];const r=await rest(`watch_transfers?to_user_id=eq.${s.user.id}&status=eq.pending&select=*,watches(brand,model,reference,cover_image_url),profiles!watch_transfers_from_user_id_fkey(username)&order=created_at.desc`);return r.json()}
+export async function fetchIncomingTransfers(){const s=getSession();if(!s)return[];const r=await rest(`watch_transfers?to_user_id=eq.${s.user.id}&status=eq.pending&select=id,watch_id,from_user_id,to_user_id,status,message,created_at,watches(brand,model,reference,cover_image_url)&order=created_at.desc`);return r.json()}
 export async function acceptWatchTransfer(id:string){return rpc('accept_watch_transfer',{p_transfer:id})}
 export async function refreshAgeMode(){return rpc('refresh_my_age_mode',{})}

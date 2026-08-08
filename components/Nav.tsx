@@ -2,27 +2,5 @@
 import Link from 'next/link';
 import {Menu,X} from 'lucide-react';
 import {useState} from 'react';
-
-export default function Nav(){
-  const[open,setOpen]=useState(false);
-  const close=()=>setOpen(false);
-  return <header className="topbar public-topbar">
-    <div className="container nav public-nav">
-      <Link className="logo" href="/" onClick={close}>WATCH<span>VAULT</span></Link>
-      <nav className="navlinks">
-        <Link href="/collection">Collezioni</Link><Link href="/social">Community</Link><Link href="/marketplace">Marketplace</Link><Link href="/maintenance">Manutenzioni</Link>
-      </nav>
-      <div className="desktop-auth"><Link className="btn" href="/login">Accedi</Link><Link className="btn primary" href="/register">Registrati</Link></div>
-      <button className="mobile-menu-button" type="button" onClick={()=>setOpen(v=>!v)} aria-label={open?'Chiudi menu':'Apri menu'} aria-expanded={open}>{open?<X size={22}/>:<Menu size={22}/>}</button>
-    </div>
-    <div className={`mobile-menu ${open?'open':''}`}>
-      <nav className="mobile-menu-links">
-        <Link onClick={close} href="/collection">Collezioni</Link>
-        <Link onClick={close} href="/social">Community</Link>
-        <Link onClick={close} href="/marketplace">Marketplace</Link>
-        <Link onClick={close} href="/maintenance">Manutenzioni</Link>
-      </nav>
-      <div className="mobile-menu-actions"><Link onClick={close} className="btn" href="/login">Accedi</Link><Link onClick={close} className="btn primary" href="/register">Crea account</Link></div>
-    </div>
-  </header>
-}
+import LanguageSelector from '@/components/LanguageSelector';
+export default function Nav(){const[open,setOpen]=useState(false);const close=()=>setOpen(false);return <header className="topbar public-topbar"><div className="container nav public-nav"><Link className="logo" href="/" onClick={close}>WATCH<span>VAULT</span></Link><nav className="navlinks"><Link href="/collection">Collezioni</Link><Link href="/social">Community</Link><Link href="/marketplace">Marketplace</Link><Link href="/maintenance">Watch Care</Link><Link href="/story">La nostra storia</Link></nav><div className="desktop-auth"><LanguageSelector/><Link className="btn" href="/login">Accedi</Link><Link className="btn primary" href="/register">Registrati</Link></div><button className="mobile-menu-button" type="button" onClick={()=>setOpen(v=>!v)} aria-label={open?'Chiudi menu':'Apri menu'} aria-expanded={open}>{open?<X size={22}/>:<Menu size={22}/>}</button></div><div className={`mobile-menu ${open?'open':''}`}><nav className="mobile-menu-links"><Link onClick={close} href="/collection">Collezioni</Link><Link onClick={close} href="/social">Community</Link><Link onClick={close} href="/marketplace">Marketplace</Link><Link onClick={close} href="/maintenance">Watch Care</Link><Link onClick={close} href="/story">La nostra storia</Link><Link onClick={close} href="/privacy">Privacy</Link><Link onClick={close} href="/terms">Termini</Link></nav><LanguageSelector/><div className="mobile-menu-actions"><Link onClick={close} className="btn" href="/login">Accedi</Link><Link onClick={close} className="btn primary" href="/register">Crea account</Link></div></div></header>}

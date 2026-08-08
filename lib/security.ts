@@ -1,0 +1,7 @@
+'use client';
+import {getSession} from './supabase';
+const base=(process.env.NEXT_PUBLIC_SUPABASE_URL||process.env.SUPABASE_URL)?.replace(/\/$/,'');
+const key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY||process.env.SUPABASE_PUBLISHABLE_KEY;
+function headers(token?:string){return {'Content-Type':'application/json',apikey:key||'',...(token?{Authorization:`Bearer ${token}`}:{})}}
+export async function changePasswordSecure(currentPassword:string,newPassword:string){const s=getSession();if(!s||!base||!key)throw new Error('Sessione scaduta. Accedi di nuovo.');const email=s.user?.email;if(!email)throw new Error('Email account non disponibile.');const verify=await fetch(`${base}/auth/v1/token?grant_type=password`,{method:'POST',headers:headers(),body:JSON.stringify({email,password:currentPassword})});if(!verify.ok)throw new Error('La password attuale non è corretta.');const r=await fetch(`${base}/auth/v1/user`,{method:'PUT',headers:headers(s.access_token),body:JSON.stringify({password:newPassword})});if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.msg||d.message||'Cambio password non riuscito')}return true}
+export function currentDeviceLabel(){if(typeof navigator==='undefined')return 'Dispositivo corrente';const ua=navigator.userAgent;const device=/iPhone/i.test(ua)?'iPhone':/iPad/i.test(ua)?'iPad':/Android/i.test(ua)?'Android':/Mac/i.test(ua)?'Mac':'Dispositivo';const browser=/CriOS|Chrome/i.test(ua)?'Chrome':/Safari/i.test(ua)?'Safari':'Browser';return `${device} · ${browser}`}

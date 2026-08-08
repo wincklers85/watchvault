@@ -1,0 +1,16 @@
+'use client';
+import {getSession} from './supabase';
+const base=(process.env.NEXT_PUBLIC_SUPABASE_URL||process.env.SUPABASE_URL)?.replace(/\/$/,'');
+const key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY||process.env.SUPABASE_PUBLISHABLE_KEY;
+function headers(token?:string){return {'Content-Type':'application/json',apikey:key||'',...(token?{Authorization:`Bearer ${token}`}:{})}}
+async function rest(path:string,init:RequestInit={}){const s=getSession();if(!s||!base||!key)throw new Error('Sessione scaduta.');const r=await fetch(`${base}/rest/v1/${path}`,{...init,headers:{...headers(s.access_token),...(init.headers||{})}});if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.message||d.details||d.hint||'Operazione non riuscita')}return r}
+async function rpc(name:string,body:Record<string,unknown>={}){const r=await rest(`rpc/${name}`,{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify(body)});const txt=await r.text();if(!txt)return null;try{return JSON.parse(txt)}catch{return txt}}
+export async function fetchMyLifecycleStates(){const s=getSession();if(!s)return[];const r=await rest(`watches?owner_id=eq.${s.user.id}&lifecycle_status=not.in.(sold_external,transferred)&select=id,lifecycle_status`);return r.json()}
+export async function fetchWatchLifecycle(watchId:string){const [events,transfers,listings]=await Promise.all([rest(`watch_passport_events?watch_id=eq.${watchId}&select=*&order=event_date.desc,created_at.desc`).then(r=>r.json()),rest(`watch_transfers?watch_id=eq.${watchId}&select=*&order=created_at.desc`).then(r=>r.json()),rest(`marketplace_listings?watch_id=eq.${watchId}&select=id,status,price,currency,created_at,sold_at,buyer_id&order=created_at.desc`).then(r=>r.json())]);return{events,transfers,listings}}
+export async function addWatchHistoryEvent(input:{watchId:string;eventType:string;title:string;description?:string;eventDate:string;amount?:number|null;currency?:string;isPublic?:boolean}){return rpc('add_watch_history_event',{p_watch:input.watchId,p_event_type:input.eventType,p_title:input.title,p_description:input.description||'',p_event_date:input.eventDate,p_amount:input.amount??null,p_currency:input.currency||'EUR',p_is_public:!!input.isPublic})}
+export async function initiateWatchTransfer(watchId:string,username:string,message?:string){return rpc('initiate_watch_transfer',{p_watch:watchId,p_username:username,p_message:message||null})}
+export async function setWatchLossStatus(watchId:string,status:'lost'|'stolen'|'recovered',notes?:string){return rpc('set_watch_loss_status',{p_watch:watchId,p_status:status,p_notes:notes||null})}
+export async function completeMarketplaceSale(listingId:string,buyerUsername?:string){return rpc('complete_marketplace_sale',{p_listing:listingId,p_buyer_username:buyerUsername?.trim()||null})}
+export async function fetchIncomingTransfers(){const s=getSession();if(!s)return[];const r=await rest(`watch_transfers?to_user_id=eq.${s.user.id}&status=eq.pending&select=id,watch_id,from_user_id,to_user_id,status,message,created_at,watches(brand,model,reference,cover_image_url)&order=created_at.desc`);return r.json()}
+export async function acceptWatchTransfer(id:string){return rpc('accept_watch_transfer',{p_transfer:id})}
+export async function refreshAgeMode(){return rpc('refresh_my_age_mode',{})}

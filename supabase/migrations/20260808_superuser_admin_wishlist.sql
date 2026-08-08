@@ -1,0 +1,6 @@
+-- Applied to production Supabase on 2026-08-08.
+-- Roles: user/moderator/admin/superuser; @wincklers is the sole initial superuser.
+-- Admins may manage user status and serial alerts. Only superuser may assign admin roles
+-- or hard-delete platform content. Privileged actions are recorded in immutable admin_audit_log.
+-- Adds watch_wishlist with owner-only RLS and maintenance duplicate guard.
+-- See live migration names: superuser_admin_wishlist_and_maintenance_guard and staff_content_read_policy.
